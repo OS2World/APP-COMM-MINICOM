@@ -1,0 +1,183 @@
+#
+# Makefile for Minicom - fill in your system
+#
+
+# Where to install things for Linux/PRO
+#BINDIR	= /usr/ucb
+#LIBDIR	= /conf/ucb/minicom
+# Where to install things for "normal" sites.
+BINDIR	= /usr/local/bin
+LIBDIR	= /usr/local/etc
+
+# Take these flags for a SysV system (sysv/HPUX/Linux)
+
+#FLAGS	= -D_SYSV		 			   # Generic Sysv
+#FLAGS	= -D_SYSV -D_POSIX_SOURCE			   # Posix SysV
+#FLAGS	= -D_POSIX_SOURCE -D_HPUX_SOURCE -D_SYSV -D_SELECT # HPUX
+#FLAGS	= -D_SYSV -D_SVR2 -D_POSIX_SOURCE -D_NO_TERMIOS	   # Sysv R2, eg UnixPC
+
+FLAGS	= -Wall -D_POSIX_SOURCE -D_SYSV -D_SELECT	   # Sysv with select()
+#							   # and gcc (Linux!)
+# Only include the "keyserv" program if you don't have select()
+PROGS	= minicom runscript #keyserv
+LFLAGS	= -s
+LIBS	= -ltermcap
+CC	= cc
+O	= o
+
+# Take these flags for the PC Minix ACK compiler
+#LFLAGS	= -i
+#FLAGS	= -D_V7 -D_MINIX -D_POSIX_SOURCE -D_ACK -D_NO_TERMIOS
+#PROGS	= minicom runscript keyserv
+#LIBS	=
+#CC	= cc
+#O	= s
+
+# Take these flags for Bruce Evans' bcc
+#LFLAGS	= -i -s
+#FLAGS	= -D_V7 -D_MINIX -D_POSIX_SOURCE -D_NO_TERMIOS
+#PROGS	= minicom runscript keyserv
+#LIBS	=
+#CC	= bcc
+#O	= o
+## Rule for Minix make & bcc's .o files
+#.c.$(O):
+#	$(CC) $(FLAGS) -c $<
+
+# Take these flags for a 68000 Minix
+#LFLAGS	= -s
+#FLAGS	= -D_V7 -D_MINIX -D_POSIX_SOURCE -D_NO_TERMIOS
+#PROGS	= minicom runscript keyserv
+#LIBS	=
+#CC	= cc
+#O	= o
+
+# Take these flags for BSD 4.3 (Apollo Domain/OS). Use the first FLAGS line.
+# You can also try -D_POSIX_SOURCE, but combined with -D_NO_TERMIOS.
+# For BSD/386, the Posix termios interface works fine so you can take
+# the second FLAGS line.
+#LFLAGS	= -s
+#FLAGS	= -D_BSD43 -D_V7 -D_SELECT			# BSD style ioctls
+#FLAGS	= -Wall -DDEBUG -D_BSD43 -D_V7 -D_SELECT     # BSD with Posix termios
+#PROGS	= minicom runscript
+#LIBS	= -ltermcap
+#CC	= cc
+#O	= o
+
+# Take these flags for Mark Williams' Coherent version 3.2 (286 version)
+#FLAGS	= -D_V7 -D_COHERENT -D_COH3
+#LFLAGS	= -s
+#PROGS	= minicom runscript keyserv
+#LIBS	= -lterm
+#CC	= cc
+#O	= o
+
+# These flags will probably work for Coherent 4 and up (not tested!)
+#FLAGS	= -D_POSIX_SOURCE -D_V7 -D_COHERENT -D_NO_TERMIOS
+#LFLAGS	= -s
+#PROGS	= minicom runscript keyserv
+#LIBS	= -ltermcap
+#CC	= cc
+#O	= o
+
+# Nothing should have to change beneath this line
+
+SRCS	= minicom.c vt100.c config.c help.c updown.c \
+	  fastsystem.c dial.c window.c wkeys.c ipc.c main.c \
+	  keyserv.c windiv.c script.c sysdep1.c sysdep2.c \
+	  rwconf.c
+
+HDRS	= minicom.h window.h keyboard.h charmap.h config.h \
+	  configsym.h patchlevel.h vt100.h
+
+OTHERS  = Makefile Install Readme Todo unixlogin saralogin scriptdemo \
+	  Manual.scr Manual.mnc Readme.rzsz Readme.Coh minicom.users \
+	  History minicom.1
+
+MOBJS	= minicom.$(O) vt100.$(O) config.$(O) help.$(O) updown.$(O) \
+	  fastsystem.$(O) dial.$(O) window.$(O) wkeys.$(O) ipc.$(O) \
+	  windiv.$(O) sysdep1.$(O) sysdep2.$(O) rwconf.$(O) main.$(O)
+
+KOBJS	= keyserv.$(O) wkeys.$(O) sysdep2.$(O)
+
+SOBJS	= script.$(O)
+
+CFLAGS	= $(FLAGS) -DLIBDIR=\"$(LIBDIR)\"
+
+all:		$(PROGS)
+
+minicom:	$(MOBJS)
+		$(CC) $(LFLAGS) -o minicom $(MOBJS) $(LIBS)
+
+keyserv:	$(KOBJS)
+		$(CC) -o keyserv $(LFLAGS) $(KOBJS) $(LIBS)
+
+runscript:	$(SOBJS)
+		$(CC) -o runscript $(LFLAGS) $(SOBJS)
+
+script.$(O):	script.c
+
+keyserv.$(O):	keyserv.c $(HDRS)
+
+minicom.$(O):	minicom.c $(HDRS)
+
+main.$(O):	main.c $(HDRS)
+
+windiv.$(O):	windiv.c $(HDRS)
+
+vt100.$(O):	vt100.c $(HDRS)
+
+config.$(O):	config.c $(HDRS)
+
+fastsystem.$(O): fastsystem.c $(HDRS)
+
+dial.$(O):	dial.c $(HDRS)
+
+help.$(O):	help.c $(HDRS)
+
+updown.$(O):	updown.c $(HDRS)
+
+window.$(O):	window.c $(HDRS)
+
+wkeys.$(O):	wkeys.c $(HDRS)
+
+ipc.$(O):	ipc.c $(HDRS)
+
+sysdep1.$(O):	sysdep1.c $(HDRS)
+
+sysdep2.$(O):	sysdep2.c $(HDRS)
+
+rwconf.$(O):	rwconf.c $(HDRS)
+
+shar:
+		@echo Creating shar archive..
+		@shar $(SRCS) $(HDRS) $(OTHERS) > minicom.sh
+		@echo Compressing..
+		@rm -f mc15b.sh.Z
+		@compress -b13 mc15b.sh
+		@rm -f mc15b.sh
+
+tgz:
+		@echo Creating gzipped tar archive..
+		@tar cvfz mc15b.tgz $(SRCS) $(HDRS) $(OTHERS)
+
+tar:
+		@echo Creating tar archive..
+		@tar cvf mc15b.tar $(SRCS) $(HDRS) $(OTHERS)
+		@echo Compressing..
+		@rm -f mc15b.tar.Z
+		@compress -b13 mc15b.tar
+		@rm -f mc15b.tar
+
+lzh:
+		@echo Creating lharc archive..
+		@rm -f mc15b.lzh
+		@lha a mc15b.lzh $(SRCS) $(HDRS) $(OTHERS)
+		@rm -f *.bak
+
+install:	$(PROGS)
+		sh install.sh $(LIBDIR) $(BINDIR)
+
+clean:
+		rm -f *.$(O) minicom keyserv runscript mc15b.*
+

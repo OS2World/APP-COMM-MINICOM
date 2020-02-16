@@ -1,0 +1,25 @@
+TODO for version 1.5: [still the same as for 1.4 :-) ]
+
+- Use official termcap entries for line character set (if there are)
+- Official termcap entries for color...
+- VT100 emulation is probably not complete (don't have doc's), but good
+  enough for most applications (including Unix).
+  Still missing:
+  	- Emulation of keypad keys in applications mode
+  	- Switching character sets
+  	- Double width / double height / 132 characters
+  	- Line printer support
+  	- Setting tab stops (now hardcoded TAB=8 spaces)
+  	- LED functions.
+  As you see, none of these are likely to be needed much.
+
+- Probably Viditel (Prestel) support will be added.
+
+- There is still a bug in the DCD detection ; sometimes Minicom does not
+  see that DCD has dropped. There is also an emulation mode for systems
+  that don't have DCD detection. If Minicom thinks a system does not have
+  DCD, it fakes the on and offline messages (and on/offline appear in
+  CAPITALS). Sometimes, on systems with DCD, it switches to on- and offline
+  in capitals. Hmmmm..... If someone could give me a clue on this..
+  (be warned: the code in main.c is quite obscure.)
+

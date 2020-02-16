@@ -1,0 +1,17 @@
+			=== README ===
+
+Take a look at the next files:
+
+Install		- How to install Minicom
+Makefile	- Configurable Makefile
+Manual.scr	- Manual for the 'runscript' program
+minicom.1	- Manual for 'minicom' itself.
+		  A formatted version for those without nroff is in Manual.mnc.
+Readme		- recursion..
+Readme.rzsz	- a patch for the popular unix rz/sz package.
+Readme.Coh	- notes for coherent users
+History		- Probably does not interest you :-)
+
+saralogin	-
+unixlogin	-
+scriptdemo	- Demo's for the 'runscript' program.

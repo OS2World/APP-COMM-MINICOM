@@ -1,0 +1,94 @@
+	Log of changes made to Minicom.
+
+Miquel van Smoorenburg, miquels@drinkel.nl.mugnet.org
+			miquels@cistron.nl.mugnet.org
+			miquels@hacktic.nl
+			miquels@htsa.aha.nl
+			(One of these should work!)
+
+- Somewhere in middle 1991
+	Made first version of Minicom, based on a not-yet-finished
+	window library of Fred van Kempen. Used Non blocking IO
+	patches to the kernel for asynchronous IO. Used lots of
+	CPU time. Ran under my version of Minix only.
+	Decided later to write my own window routines.
+	Did away with non blocking IO, started to use a separate
+	process for the IO from keyboard to modem.
+	Added color routines, perfected communication between
+	"keyserv" and minicom.
+	Got it running under BSD.
+
+- Februari, 1992.
+	Posted Minix version 1.2 to comp.os.minix. Got some feedback ;
+	it even ran under Coherent. Changed keyserv to communicate
+	with minicom through pipes. Changed some menu's and command
+	line interface. Ported it to Sysv and Linux. Changed the
+	configuration file to ASCII. Added redialing.
+
+- June, 1992.
+	Posted version 1.3 to comp.os.minix.
+	Did not seem to work under Linux. Added ~NOECHONL to routines
+	in sysdep1.c. Added special Linux case hard coded escape
+	sequence for color. Found bug in window.c:wscroll. In full
+	screen mode insert line / delete line did not work OK.
+	Found bug in window.c:wdelchar. Character under the cursor
+	was not correctly deleted. Found bug in keyserv: when running
+	an external command (up/download, runscript) and ^A or some
+	ALT combination was pressed, keyserv would send too many
+	ACK signals back so that minicom would be killed. Now call
+	m_flush(0) in ipc.c:keyserv before re-starting keyserv.
+	(Posix signal interface could solve this ; however, a lot of
+	systems don't have that including Minix 1.5).
+	Changed DCD handling ; minicom first tried to find out for 
+	itself it the OS and modem supported the DCD line. Now it's
+	a configuration option in "modem and dialing".
+	Found bug in keyserv.c for Coherent: used #ifdef COHERENT
+	instead of _COHERENT.
+
+Sun, Jun 21 1992
+	Posted diffs for 1.3 -> 1.3.2
+
+Juli, 1992.
+	Got a 386, so installed Linux. Of course, the first thing to do
+	(after getting X up :-) was to work on minicom. Now ISIG is on
+	when running up/download protocols and runscript, so that you
+	can interrupt them. Removed flushing from ipc.c, now the bug with
+	windows not getting deleted is solved. Added nice sound effect
+	for Linux when connected and when up/download is ready.
+	Removed bugs with scroll regions in both vt100.c and window.c.
+	ALT key now works under Linux.
+
+March, 1993.
+	Been working on new version of minicom that does not use the
+	keyserv process on systems with select, has sz/rz builtin,
+	has new configuration files and so on. However, this is a
+	_big_ project. So I decided to give the 'old' minicom 1.3.2
+	a revision because people have been complaining about bugs some
+	time. This revision is only tested under Linux and Minix: be warned.
+
+April, 1993.
+	Put a beta version of minicom 1.4 up for ftp. Changes made
+	_after_ this are:
+	Corrected documentation for the new configuration with
+	Makefile and config.h. Changed internals of vt100.c and
+	window.c so that window.c now handles the translation of
+	IBM characters to normal characters, if needed. Can use IBM
+	characters in windows now (status line, help window).
+
+August, 1993.
+	Changed minicom to use the select() system call, if present.
+	The keyserv process is no longer needed for such systems.
+	Fixed some bugs in the vt100 emulation (still not complete,
+	and never will be..) so that it does not crash anymore.
+	Fixed other bugs. Minicom should be pretty stable now.
+	'Modulized' the window.c and vt100.c, so that they can be
+	used for some other project (can you say: ANSI-BBS?).
+	Version number bumped up to 1.5.
+
+October, 1993.
+	Added local echo and multiple dial strings, both can be set
+	in the dialing directory. Changed the wgets() function to
+	allow longer lines to be editted (now scrolls).
+	Added a scroll back buffer (yeah!).
+	Fixed bug in m_dtrtoggle: dtr never got set high again.. How
+	could this ever have worked??

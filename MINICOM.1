@@ -1,0 +1,529 @@
+.\" This file Copyright 1992,93 Michael K. Johnson (johnsonm@stolaf.edu)
+.\" It may be distributed under the GNU Public License, version 2, or
+.\" any higher version.  See section COPYING of the GNU Public license
+.\" for conditions under which this file may be redistributed.
+.TH MINICOM 1 "9 Oct 1993" "Cohesive Systems" "Linux Programmer's Manual"
+.SH NAME
+minicom \- friendly serial communication program
+.SH SYNOPSIS
+.B minicom
+.RI "[-soml] [-c on|off] [-a on|off]"
+.br
+.in 15
+.RI "[-t term] [" configuration ]
+.SH DESCRIPTION
+.B minicom
+is a communication program which somewhat resembles the shareware
+program TELIX but is free with source code and runs under most unices.
+Features include dialing directory with auto-redial, support for
+UUCP-style lock files on serial devices, a seperate script language
+interpreter, capture to file, multiple users with individual
+configurations, and more.
+.SH COMMAND-LINE
+.TP 0.5i
+.B -s
+.BR S etup.
+This is allowed for root only. When this option is used,
+minicom does 
+.I not 
+initialize, but puts you directly into the
+configuration menu. This is very handy if minicom refuses to start up
+because your system has changed, or for the first time you run
+minicom. For most systems, reasonable defaults are already compiled in.
+.TP 0.5i
+.B -o
+Do not initialize. Minicom will skip the initialization code.  This
+option is handy if you quitted from minicom without resetting, and
+then want to restart a session. It is potentially dangerous though: no
+check for lock files etc. is made, so a normal user could interfere
+with things like uucp... Maybe this will be taken out later. For now
+it is assumed, that users who are given access to a modem are
+responsible enough for their actions.
+.TP 0.5i
+.B -m
+Override command-key with the Meta or ALT key. This can also be
+configured in one of minicom's menus, but if you use different
+terminals all the time, of which some don't have a Meta or ALT key,
+it's handy to set the default command key to Ctrl-A and use this option
+when you have a keyboard supporting Meta or ALT keys.
+.TP 0.5i
+.B -l
+.BR L iteral
+translation of characters with the high bit set. With this flag on,
+minicom will not try to translate the IBM line characters to ASCII,
+but passes them straight trough. Many PC-unix clones will display
+them correctly without translation (Linux in a special mode, Coherent
+and Minix).
+.TP 0.5i
+.B -a
+.BR A ttribute
+usage. Some terminals, notably televideo's, have a rotten attribute
+handling (serial instead of parallel). By default, minicom uses '-a
+on', but if you are using such a terminal you can (must!)  supply the
+option '-a off'. The trailing 'on' or 'off' is needed.
+.TP 0.5i
+.B -t
+.BR T erminal
+type. With this flag, you can override the environment TERM variable.
+This is handy for use in the MINICOM environment variable; one can create
+a special termcap entry for use with minicom on the console, that
+initializes the screen to raw mode so that in conjunction with the -l
+flag, the IBM line characters are displayed untranslated.
+.TP 0.5i
+.B -c
+.BR C olor
+usage. Some terminals (such as the Linux console) support color with
+the standard ANSI escape sequences. Because there is apparently no
+termcap support for color, these escape sequences are hard-coded into
+minicom. Therefore this option is off by default.  You can turn it on
+with '-c on'. This, and the '-m' option, are good candidates to put
+into the MINICOM environment variable.
+.PP
+.RS 0.5i
+When
+.B minicom
+starts, it first searches the MINICOM environment variable for
+command-line arguments, which can be over-ridden on the command line.
+Thus, if you have done
+.PP
+.RS 0.5i
+.PD 0
+MINICOM='-m -c on'
+.PP
+export MINICOM
+.PP
+.PD 1
+.PP
+.RE
+or the equivalent, and start minicom, minicom will assume that your
+terminal
+.I has 
+a Meta or <ALT> key and that color is supported.  If you then log in
+from a terminal without color support, and you have set MINICOM in your
+startup (.profile or equivalent) file, and don't want to re-set your
+environment variable, you can type 'minicom -c off' and run without
+color support for that session.
+.RE
+.TP 0.5i
+.B configuration
+The
+.I configuration
+argument is more interesting. Normally, minicom gets its defaults from
+a file called "minirc.dfl". If you however give an argument to
+minicom, it will try to get its defaults from a file called
+"minirc.\fIconfiguration\fR\|".  So it is possible to create multiple
+configuration files, for different ports, different users etc. Most
+sensible is to use device names, such as tty1, tty64, sio2 etc. If a
+user creates his own configuration file, it will show up in his home
+directory as '.minirc.dfl'.
+.SH USE
+Minicom is windows-based. To popup a window with the function you
+want, press Control-A (from now on, we will use C-A to mean
+Control-A), and then the function key (a-z or A-Z). By pressing C-A
+first and then 'z', a help screen comes up with a short summary of all
+commands. This escape key can be altered when minicom is configured
+(-s option or C-A O), but we'll stick to Control-A for now.
+.PP
+.PD 0
+For every menu the next keys can be used:
+.TP 0.75i
+.B UP
+arrow-up or 'k'
+.TP 0.75i
+.B DOWN
+arrow-down or 'j'
+.TP 0.75i
+.B LEFT
+arrow-left or 'h'
+.TP 0.75i
+.B RIGHT
+arrow-right or 'l'
+.TP 0.75i
+.B CHOOSE
+Enter
+.TP 0.75i
+.B CANCEL
+ESCape.
+.PD 1
+.PP
+The screen is divided into two portions: the upper 24 lines are the
+terminal-emulator screen. In this window, ANSI or VT100 escape
+sequences are interpreted. If MINIX emulation is chosen, this window
+will be 25 lines long (if possible).  If there is a line left at the
+bottom, a status line is placed there.  If this is not possible the
+status line will be showed every time you press C-A.
+.PP
+.PD 0
+Possible commands are listed next, in alphabetical order.
+.TP 0.5i
+.B C-A
+Pressing C-A a second time will just send a C-A to the remote system.
+If you have changed your "escape character" to something other than
+C-A, this works analogously for that character.
+.TP 0.5i
+.B A
+Toggle 'Add Linefeed' on/off. If it is on, a linefeed is added before
+every carriage return displayed on the screen.
+.TP 0.5i
+.B B
+Gives you a scroll back buffer. You can scroll up with \fBu\fP, down with
+\fBd\fP, a page up with \fBb\fP, a page down with \fBf\fP, and if you have them
+the \fBarrow\fP and \fBpage up/page down\fP keys can also be used.
+.TP 0.5i
+.B C
+Clears the screen.
+.TP 0.5i
+.B D
+Dial a number, or go to the dialing directory.
+.TP 0.5i
+.B E
+Toggle local echo on and off (if your version of minicom supports it).
+.TP 0.5i
+.B F
+A break signal is sent to the modem.
+.TP 0.5i
+.B G
+Run script (Go). Runs a login script.
+.TP 0.5i
+.B H
+Hangup.
+.TP 0.5i
+.B I
+Toggle the type of escape sequence that the cursor keys send between
+normal and applications mode. (See also the comment about the status
+line below).
+.TP 0.5i
+.B J
+Jump to a shell. On return, the whole screen will be redrawn.
+.TP 0.5i
+.B K
+Clears the screen, runs kermit and redraws the screen upon return.
+.TP 0.5i
+.B L
+Turn Capture file on off. If turned on, all output sent to the screen
+will be captured in the file too.
+.TP 0.5i
+.B M
+Sends the modem initialization string.
+.TP 0.5i
+.B O
+Configure minicom. Puts you in the configuration menu.
+.TP 0.5i
+.B P
+Communication Parameters. Allows you to change the baudrate, parity and
+number of bits.
+.TP 0.5i
+.B Q
+Exit minicom without resetting the modem.
+.TP 0.5i
+.B R
+Recieve files. Choose from various protocols (external).
+.TP 0.5i
+.B S
+Send files. Ditto.
+.TP 0.5i
+.B T
+Choose Terminal emulation: Minix-Ansi(color)-vt100.
+.TP 0.5i
+.B W
+Toggle linewrap on/off.
+.TP 0.5i
+.B X
+Exit minicom, reset modem.
+.TP 0.5i
+.B Z
+Pop up the help screen.
+.PD 1
+.SH "DIALING DIRECTORY"
+By pressing C-A D the program asks:
+.PP
+.RS 0.5i
+"Number to dial: (enter for dialing directory) " _
+.RE
+.PP
+You can now directly enter a number to dial, or press <enter>.  If you
+enter the phone (not dialing directory) number to dial, it will be
+dialed, and if you press <enter> then the dialing directory will be
+drawn.  You can add, delete or edit entries.  By choosing "dial" the
+phone number of the highlighted entry will be dialed. While the modem
+is dialing, you can press any key to cancel dialing. Your dialing
+directory will be saved into a the file ".dialdir" in your home
+directory.  You can scroll up and down with the arrow keys, but you
+can also scroll complete pages by pressing the PageUp or PageDown key.
+If you don't have those, use Control-B (Backward) and Control-F
+(Forward).
+.PP
+The "edit" menu speaks for itself, but I will discuss it briefly here.
+.PD 0
+.TP 1.0i
+.B A - Name
+The name for this entry
+.TP 1.0i
+.B B - Number
+and its telephone number.
+.TP 1.0i
+.B C - Dial string #
+Which specific dial string you want to use to connect. There are three
+different dial strings (prefixes and suffixes) that can be configured
+in the \fBModem and dialing\fP menu.
+.TP 1.0i
+.B D - Local echo
+can be on or off for this system (if your version of minicom supports it).
+.TP 1.0i
+.B E - Script 
+The script that must be executed after a succesfull connection is made
+(see the manual for runscript)
+.TP 1.0i
+.B F - Username
+The username that is passed to the runscript program.  It
+is passed in the environment string "$LOGIN".
+.TP 1.0i
+.B G - Password
+The password is passed as "$PASS".
+.TP 1.0i
+.B H - Terminal Emulation
+Use MINIX, ANSI or VT100 emulation.
+.TP 1.0i
+.B I - Line settings
+Baudrate, bits and parity to use for this connection.
+.PD 1
+.PP
+.SH CONFIGURATION
+By pressing C-A O you will be thrown into the setup menu. Most
+settings there can be changed by everyone, but some are restricted
+to root only. Those priviliged settings are marked with a star (*) here.
+.PP
+.PD 0
+.B "Filenames and paths"
+.PP
+.RS 0.25i
+This menu defines your default directories.
+.TP 0.5i
+.B A - upload
+where the uploaded files go to.
+.TP 0.5i
+.B B - download
+Yup, you guessed it.
+.TP 0.5i
+.B C - script
+Where you keep your login scripts.
+.TP 0.5i
+.B D - Script program
+Which program to use as the script interpreter. Defaults to the
+program "runscript", but if you want to use something else (eg,
+/bin/sh or "expect") it is possible.  Stdin and stdout are connected
+to the modem, stderr to the screen.
+.RS 0.5i
+If the path is relative (ie, does not start with a slash) then it's
+relative to your home directory, except for the script interpreter.
+.RE
+.TP 0.5i
+.B E - Kermit program
+Where to find the executable for kermit, and it's options. Some simple
+macro's can be used on the command line: '%l' is expanded to the
+complete filename of the dial out-device, and '%b' is expanded to
+the current baudrate.
+.RE
+.RE
+.PD 1
+.PP
+.B "File Transfer Protocols"
+.PD 0
+.PP
+.RS 0.25i
+Protocols defined here will show up when C-A s/r is pressed.
+"Name" is the name that will show up in the menu. "Program" is
+the path to the protocol. "NeedName" defines if the program needs an
+argument, eg. a file to be transmitted. Up/Down defines
+if this entry should show up in the upload or the download menu.
+Fullscr defines if the program should run full screen, or that
+minicom will only show it's stderr in a window. Finally, IO-Red
+defines if minicom should attach the program's standard in and output
+to the modem port or not. The old sz and rz are not full screen, and
+have IO-Red set. However, there are curses based versions of at least
+rz that do not want their stdin and stdout redirected, and run full
+screen.
+All file transfer protocols are run with the UID of the user, and
+not with UID=root. '%l' and '%b' can be used on the command line as
+with kermit.
+.RE
+.PD 1
+.PP
+.B "Serial port setup"
+.RS 0.25i
+.PD 0
+.TP 0.5i
+.B *A - Serial device
+/dev/tty1 for most people, or maybe /dev/tty64 if you use the VC
+package under minix.  /dev/cua<n> or /dev/modem under linux.
+.TP 0.5i
+.B *B - Lock file location
+This should be /usr/spool/uucp. If this directory does not exist,
+minicom will not attempt to use lockfiles.
+.TP 0.5i
+.B *C - Callin program
+If you have a uugetty or something on your serial port, it could be
+that you want a program to be run to switch the modem cq. port into
+dialin/dialout mode. This is the program to get into dialin mode.
+.TP 0.5i
+.B *D - Callout program
+And this to get into dialout mode.
+.TP 0.5i
+.B E - Baud/Par/Bits
+Default parameters at startup.
+.PD 1
+.PP  
+If one of the entries is left blank, it will not be used. So if you
+don't care about locking, and don't have a getty running on your
+modemline, entries B - D should be left blank.  Be warned! The callin
+and callout programs are run with the effective user id of "root", eg
+0!
+.RE
+.PP
+.B "Modem and Dialing"
+.PD 0
+.PP
+.RS 0.25i
+Here, the parameters for your modem are defined. I will not explain
+this further because the defaults are for generic Hayes modems, and
+should work always. This file is not a Hayes tutorial :-) The only
+thing worth noticing is that control characters can be sent by
+prefixing them with a '^', in which '^^' means '^' itself.  Some
+options however, don't have much to do with the modem but more with
+the behaviour of minicom itself:
+.PP
+.TP 0.5i
+.B M - Dial time
+The number of seconds before minicom times out if no connection is
+established.
+.TP 0.5i
+.B N - Delay before redial
+Minicom will redial if no connection was made, but it first waits some
+time.
+.TP 0.5i
+.B O - Number of tries
+Maximum number of times that minicom attempts to dial.
+.TP 0.5i
+.B P - Autobaud detect
+If this is on, minicom tries to match
+the dialed party's speed.
+.TP 0.5i
+.B Q - Drop DTR to hangup
+Normally minicom hangs up by sending a Hayes-type hangup sequence but
+if your Minix supports it, it can also hangup by dropping the DTR
+line.
+.TP 0.5i
+.B R - Modem has DCD line
+If your modem, and your O/S both support the DCD line (that goes 'high'
+when a connection is made) minicom will use it.
+.PD 1
+.PP
+.RE
+.RS 0.5i
+.B Note that a special exception is made for this menu: every user
+.B can change all parameters here, but they will not be saved.
+.RE
+.PP
+.B "Screen and keyboard"
+.RS 0.25i
+.PD 0
+.TP 0.5i
+.B A - Command key is
+the 'Hot Key' that brings you into command mode. If this is set
+to 'ALT' or 'meta key', you can directly call commands
+by alt-key instead of HotKey-key.
+.TP 0.5i
+.B B - Backspace key sends
+There still are some systems that want a VT100 to send DEL instead of
+BS. With this option you can enable that stupidity.  (Eh, it's even on
+by default...)
+.TP 0.5i
+.B C - Status line is
+Enabled or disabled. Some slow terminals (for example, X-terminals)
+cause the status line to jump "up and down" when scrolling, so you can
+turn it off if desired. It will still be shown in command-mode.
+.RE
+.PD 1
+.TP 0.25i
+.B "Save setup as dfl"
+Save the parameters as the default for the next time the program is
+started. Instead of dfl, any other parameter name may appear, depending
+on which one was used when the program was started.
+.TP 0.25i
+.B "Save setup as.."
+Save the parameters under a special name. Whenever Minicom is started
+with this name as an argument, it will use these parameters. This
+option is of course priviliged to root.
+.TP 0.25i
+.B "Exit"
+Escape from this menu without saving.  This can also be done with ESC.
+.TP 0.25i
+.B "Exit from minicom"
+Only root will see this menu entry, if he/she started minicom with the '-s'
+option. This way, it is possible to change the configuration without
+actually running minicom.
+.PD 1
+.SH "STATUS LINE"
+The status line has several indicators, that speak for themselves.
+The mysterious APP or CUR indicator probably needs explanation. The
+VT100 cursor keys can be in two modes: applications mode and cursor
+mode. This is controlled by an escape sequence. If you find that
+the cursor keys do not work in, say, vi when you're logged in using
+minicom then you can see with this indicator whether the cursor keys
+are in applications or cursor mode. You can toggle the two with the
+C-A I key. If the cursor keys then work, it's probably an error in
+the remote system's termcap initialization strings (is).
+.PD 1
+.SH "SECURITY ISSUES"
+Since Minicom runs setuid root, you probably want to restrict access to
+it. This is possible by using a configuration file in the same directory
+as the default files, called "minicom.users". The syntax of this file
+is as following:
+.PP
+.RS 0.5i
+<username> <configuration> [configuration...]
+.RE
+.PP
+To allow user 'miquels' to use the default configuration, enter the 
+following line into "minicom.users":
+.PP
+.RS 0.5i
+miquels dfl
+.RE
+.PP
+If you want users to be able to use more than the default
+configurations, just add the names of those configurations behind the
+user name. If no configuration is given behind the username, minicom
+assumes that the user has access to all configurations.
+.PD 1
+.SH MISC
+If minicom is hung, kill it with SIGTERM . (This means kill -15, or
+since sigterm is default, just plain "kill <minicompid>". This will
+cause a graceful exit of minicom, doing resets and everything.
+.PP
+Since a lot of escape sequences begin with ESC (Arrow up is ESC [ A),
+Minicom does not know if the escape character it gets is you pressing
+the escape key, or part of a sequence.
+.PP
+An old version of Minicom, V1.2, solved this in a rather crude way:
+to get the escape key, you had to press it 
+.IR twice .
+Support for timing (with select) was already built in to minicom
+(see file wkeys.c) and works great under BSD, but alas, not under Minix.
+The same problem, but worse, was with Televideo type terminals. Since they
+use a lot of escape sequences that start with 'C-A', you had to
+press 'C-A' twice when you want to pop up a window or something...
+.PP
+As of release 1.3 this has bettered a little: now a 1-second timeout
+is builtin, like in vi. And... surprise: a special Minix and Linux-dependant
+.BR hack " :-) was added. Now, minicom can separate the escape key and"
+escape-sequences. To see how dirty this was done, look into wkeys.c.
+But it works like a charm!
+.SH AUTHORS
+The author of minicom and the minicom manual is Miquel van
+Smoorenburg (miquels@drinkel.nl.mugnet.org)
+.PP
+Most of this man page is copied, with corrections, from the minicom
+manual, but some pieces and the corrections are by Michael K. Johnson
+(johnsonm@stolaf.edu).
+
